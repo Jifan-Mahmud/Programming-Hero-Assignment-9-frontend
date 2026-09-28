@@ -15,7 +15,6 @@ import {
   BookmarkCheck,
   Menu,
   X as CloseIcon,
-  User,
   ChevronDown,
 } from "lucide-react";
 
@@ -27,6 +26,9 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const isActive = (path) => pathname === path;
+
+  const defaultAvatar = (name) =>
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(name || "User")}&background=0D9488&color=fff`;
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 transition-colors duration-200">
@@ -125,11 +127,11 @@ export default function Navbar() {
                 className="flex items-center gap-2 p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               >
                 <img
-                  src={user.photoURL || "https://i.ibb.co/mR70B81/user-avatar.png"}
+                  src={user.photoURL || defaultAvatar(user.name)}
                   alt={user.name}
                   className="w-9 h-9 rounded-full object-cover border-2 border-teal-500 shadow-sm"
                   onError={(e) => {
-                    e.currentTarget.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+                    e.currentTarget.src = defaultAvatar(user.name);
                   }}
                 />
                 <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200 max-w-[120px] truncate">
@@ -277,9 +279,12 @@ export default function Navbar() {
               <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center gap-3 px-4 py-2">
                   <img
-                    src={user.photoURL || "https://i.ibb.co/mR70B81/user-avatar.png"}
+                    src={user.photoURL || defaultAvatar(user.name)}
                     alt={user.name}
                     className="w-8 h-8 rounded-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = defaultAvatar(user.name);
+                    }}
                   />
                   <div>
                     <p className="text-sm font-bold text-zinc-900 dark:text-white">{user.name}</p>

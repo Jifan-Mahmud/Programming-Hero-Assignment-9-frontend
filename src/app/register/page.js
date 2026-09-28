@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import GoogleAuthModal from "../../components/GoogleAuthModal";
 import { User, Mail, Lock, Image as ImageIcon, BookOpen, Check, X, Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
@@ -17,6 +18,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = "StudyNook – Register";
@@ -35,8 +37,8 @@ export default function RegisterPage() {
     e.preventDefault();
     setErrorMsg("");
 
-    if (!name || !email || !photoURL || !password) {
-      setErrorMsg("All fields are required.");
+    if (!name || !email || !password) {
+      setErrorMsg("Name, email, and password are required.");
       return;
     }
 
@@ -45,8 +47,14 @@ export default function RegisterPage() {
       return;
     }
 
+    // Default avatar if photoURL is left blank or empty
+    const finalPhoto =
+      photoURL && photoURL.trim() !== ""
+        ? photoURL.trim()
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D9488&color=fff`;
+
     setSubmitting(true);
-    const result = await register(name, email, photoURL, password);
+    const result = await register(name, email, finalPhoto, password);
     setSubmitting(false);
 
     if (result.success) {
@@ -56,15 +64,15 @@ export default function RegisterPage() {
     }
   };
 
-  const handleGoogleRegister = async () => {
+  const handleGoogleSignIn = async (googleData) => {
     setSubmitting(true);
-    const result = await loginWithGoogle();
+    const result = await loginWithGoogle(googleData);
     setSubmitting(false);
 
     if (result.success) {
       router.push("/");
     } else {
-      setErrorMsg(result.error || "Google authentication failed");
+      setErrorMsg(result.error || "Google registration failed");
     }
   };
 
@@ -229,7 +237,8 @@ export default function RegisterPage() {
 
         {/* Google Sign In Button */}
         <button
-          onClick={handleGoogleRegister}
+          type="button"
+          onClick={() => setIsGoogleModalOpen(true)}
           disabled={submitting}
           className="w-full py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center gap-2.5 transition-colors"
         >
@@ -253,6 +262,13 @@ export default function RegisterPage() {
           </svg>
           <span>Register with Google</span>
         </button>
+
+        {/* Google Modal */}
+        <GoogleAuthModal
+          isOpen={isGoogleModalOpen}
+          onClose={() => setIsGoogleModalOpen(false)}
+          onGoogleSignIn={handleGoogleSignIn}
+        />
 
         {/* Link to Login */}
         <p className="mt-8 text-center text-xs text-zinc-600 dark:text-zinc-400">
