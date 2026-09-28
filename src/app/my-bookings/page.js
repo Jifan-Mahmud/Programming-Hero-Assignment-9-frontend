@@ -43,7 +43,7 @@ export default function MyBookingsPage() {
       }
     } catch (error) {
       console.error("Failed to fetch my bookings:", error);
-    } fontally {
+    } finally {
       setLoading(false);
     }
   };
