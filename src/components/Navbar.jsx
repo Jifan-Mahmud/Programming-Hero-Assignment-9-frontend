@@ -17,6 +17,7 @@ import {
   X as CloseIcon,
   ChevronDown,
 } from "lucide-react";
+import UserAvatar from "./UserAvatar";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -126,14 +127,7 @@ export default function Navbar() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2 p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               >
-                <img
-                  src={user.photoURL || defaultAvatar(user.name)}
-                  alt={user.name}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-teal-500 shadow-sm"
-                  onError={(e) => {
-                    e.currentTarget.src = defaultAvatar(user.name);
-                  }}
-                />
+                <UserAvatar user={user} className="w-9 h-9 rounded-full object-cover border-2 border-teal-500 shadow-sm" />
                 <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200 max-w-[120px] truncate">
                   {user.name}
                 </span>
@@ -278,14 +272,7 @@ export default function Navbar() {
 
               <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center gap-3 px-4 py-2">
-                  <img
-                    src={user.photoURL || defaultAvatar(user.name)}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = defaultAvatar(user.name);
-                    }}
-                  />
+                  <UserAvatar user={user} className="w-8 h-8 rounded-full object-cover" />
                   <div>
                     <p className="text-sm font-bold text-zinc-900 dark:text-white">{user.name}</p>
                     <p className="text-xs text-zinc-500">{user.email}</p>

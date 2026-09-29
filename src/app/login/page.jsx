@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import GoogleAuthModal from "../../components/GoogleAuthModal";
 import { LogIn, Mail, Lock, BookOpen, Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
@@ -18,7 +17,6 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = "StudyNook – Login";
@@ -47,15 +45,14 @@ function LoginForm() {
     }
   };
 
-  const handleGoogleSignIn = async (googleData) => {
-    setSubmitting(true);
-    const result = await loginWithGoogle(googleData);
-    setSubmitting(false);
-
-    if (result.success) {
-      router.push(redirectPath);
-    } else {
-      setErrorMsg(result.error || "Google login failed");
+  const handleGoogleSignIn = async () => {
+    try {
+      setSubmitting(true);
+      setErrorMsg("");
+      await loginWithGoogle();
+    } catch (err) {
+      setErrorMsg("Failed to initiate Google sign-in.");
+      setSubmitting(false);
     }
   };
 
@@ -149,9 +146,9 @@ function LoginForm() {
       {/* Google Sign In Button */}
       <button
         type="button"
-        onClick={() => setIsGoogleModalOpen(true)}
+        onClick={handleGoogleSignIn}
         disabled={submitting}
-        className="w-full py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center gap-2.5 transition-colors"
+        className="w-full py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center gap-2.5 transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24">
           <path
@@ -173,13 +170,6 @@ function LoginForm() {
         </svg>
         <span>Continue with Google</span>
       </button>
-
-      {/* Google Modal */}
-      <GoogleAuthModal
-        isOpen={isGoogleModalOpen}
-        onClose={() => setIsGoogleModalOpen(false)}
-        onGoogleSignIn={handleGoogleSignIn}
-      />
 
       {/* Link to Register */}
       <p className="mt-8 text-center text-xs text-zinc-600 dark:text-zinc-400">

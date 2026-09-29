@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import GoogleAuthModal from "../../components/GoogleAuthModal";
 import { User, Mail, Lock, Image as ImageIcon, BookOpen, Check, X, Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
@@ -18,7 +17,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = "StudyNook – Register";
@@ -47,7 +45,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // Default avatar if photoURL is left blank or empty
     const finalPhoto =
       photoURL && photoURL.trim() !== ""
         ? photoURL.trim()
@@ -58,21 +55,20 @@ export default function RegisterPage() {
     setSubmitting(false);
 
     if (result.success) {
-      router.push("/login");
+      router.push("/");
     } else {
       setErrorMsg(result.error || "Registration failed.");
     }
   };
 
-  const handleGoogleSignIn = async (googleData) => {
-    setSubmitting(true);
-    const result = await loginWithGoogle(googleData);
-    setSubmitting(false);
-
-    if (result.success) {
-      router.push("/");
-    } else {
-      setErrorMsg(result.error || "Google registration failed");
+  const handleGoogleSignIn = async () => {
+    try {
+      setSubmitting(true);
+      setErrorMsg("");
+      await loginWithGoogle();
+    } catch (err) {
+      setErrorMsg("Failed to initiate Google registration.");
+      setSubmitting(false);
     }
   };
 
@@ -238,9 +234,9 @@ export default function RegisterPage() {
         {/* Google Sign In Button */}
         <button
           type="button"
-          onClick={() => setIsGoogleModalOpen(true)}
+          onClick={handleGoogleSignIn}
           disabled={submitting}
-          className="w-full py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center gap-2.5 transition-colors"
+          className="w-full py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center gap-2.5 transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
@@ -262,13 +258,6 @@ export default function RegisterPage() {
           </svg>
           <span>Register with Google</span>
         </button>
-
-        {/* Google Modal */}
-        <GoogleAuthModal
-          isOpen={isGoogleModalOpen}
-          onClose={() => setIsGoogleModalOpen(false)}
-          onGoogleSignIn={handleGoogleSignIn}
-        />
 
         {/* Link to Login */}
         <p className="mt-8 text-center text-xs text-zinc-600 dark:text-zinc-400">

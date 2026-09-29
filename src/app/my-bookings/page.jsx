@@ -39,7 +39,7 @@ export default function MyBookingsPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setBookings(data);
+        setBookings(Array.isArray(data) ? data.filter((b) => b && b.status !== "cancelled") : []);
       }
     } catch (error) {
       console.error("Failed to fetch my bookings:", error);
@@ -71,12 +71,9 @@ export default function MyBookingsPage() {
         throw new Error(data.message || "Failed to cancel booking");
       }
 
-      toast.success("Booking cancelled");
-      setBookings(
-        bookings.map((b) =>
-          b._id === cancelTarget._id ? { ...b, status: "cancelled" } : b
-        )
-      );
+      toast.success("Booking cancelled and removed successfully!");
+      // Immediately remove the cancelled booking from UI state
+      setBookings((prev) => prev.filter((b) => b._id !== cancelTarget._id));
       setCancelTarget(null);
     } catch (error) {
       toast.error(error.message || "Failed to cancel booking");
